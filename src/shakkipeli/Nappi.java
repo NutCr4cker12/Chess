@@ -2,7 +2,7 @@
 package shakkipeli;
 
 
-public class Nappi {
+public abstract class Nappi {
     private int Xsijainti;
     private int Ysijainti;
     private Vari vari;
@@ -33,14 +33,8 @@ public class Nappi {
     public void setSiirrot(int x) {
         this.siirtoja = x;
     }
-    public Arvo getArvo() {
-        return null;
-    }
-    public String tulostaNappi() {
-        return "";
-    }
-    public boolean onkoSallittuSiirto(int x, int y) {
-        return false;
-    }
+    public abstract Arvo getArvo();
+    public abstract String tulostaNappi();
+    public abstract boolean onkoSallittuSiirto(int x, int y);
     
 }
