@@ -19,7 +19,6 @@ public class Kuningas extends Nappi {
         if (Math.abs(x - sijainti[0]) <= 1 && Math.abs(y - sijainti[1]) <= 1) {
             return true;
         }
-        System.out.println("Kuningas ei voi liikkua noin");
         return false;
     }
 

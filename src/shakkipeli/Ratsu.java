@@ -21,7 +21,6 @@ public class Ratsu extends Nappi {
         if ((dx == 2 && dy == 1) || (dx == 1 && dy == 2)) {
             return true;
         }
-        System.out.println("Ratsu ei voi liikkua noin");
         return false;
     }
 

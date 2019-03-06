@@ -127,7 +127,7 @@ public class TekstiKayttoLiittyma {
                 } else {
                     n = new Sotilas(vari);
                 }
-                n.setSiirrot(n.getSiirrot() - 1);
+                n.setSiirrot(siirrot - 1);
                 lauta.setRuutu(x, y, n);
             }
         } // end of listan parseus
@@ -266,6 +266,17 @@ public class TekstiKayttoLiittyma {
         /*
         // tarkastetaan annettu syote luvattomien siirtojen varalta:
          */
+        if (lauta.onkoMattiTilanne(p1Vari)) {
+            System.out.println("Mattitilanne pelaajalla: " + p1);
+        } else {
+            System.out.println("Ei oo Matti pelaajalle: " + p1);
+        }
+        if (lauta.onkoMattiTilanne(p2Vari)) {
+            System.out.println("Mattitilanne pelaajalla: " + p2);
+        } else {
+            System.out.println("Ei oo Matti pelaajalle: " + p2);
+        }
+        
         if (lauta.getRuutu(x1, y1 - 1).onkoTyhja()) {           // lahtoruudussa ei ole nappulaa
             System.out.println("Vaitsemassasi ruudussa " + kirjain1 + y1 + " ei ole nappulaa");
             return false;

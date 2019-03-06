@@ -24,7 +24,6 @@ public class Kuningatar extends Nappi {
         if (dx == dy) { // vinottain
             return true;
         }
-        System.out.println("Kuningatar ei voi liikkua noin");
         return false;
     }
 

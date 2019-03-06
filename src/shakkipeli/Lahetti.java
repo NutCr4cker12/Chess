@@ -21,7 +21,6 @@ public class Lahetti extends Nappi {
         if (dx == dy) { // vinottain
             return true;
         }
-        System.out.println("Lahetti ei voi liikkua noin");
         return false;
     }
 

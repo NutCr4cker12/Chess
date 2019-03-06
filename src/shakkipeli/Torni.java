@@ -19,7 +19,6 @@ public class Torni extends Nappi {
         if (x == sijainti[0] || y == sijainti[1]) { // vaaka- tai pystysuoraan
             return true;
         }
-        System.out.println("Torni ei voi liikkua noin");
         return false;
     }
 

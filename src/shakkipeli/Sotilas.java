@@ -22,7 +22,7 @@ public class Sotilas extends Nappi {
         }
         int dx = Math.abs(x - sijainti[0]);
         if (getVari() == Vari.MUSTA) { // Mustat liikkuu alaspain
-            if (getSiirrot() == 0) {
+            if (sijainti[1] == 1) { // Jos musta = rivilla 1 -> ei oo liikkunu
                 if (y - sijainti[1] == 2 && dx == 0) { // eka siirtoo saa olla 2x "eteenpain"
                     return true;
                 }
@@ -31,7 +31,7 @@ public class Sotilas extends Nappi {
                 return true;
             }
         } else { // Valkoiset liikkuu ylospain
-            if (getSiirrot() == 0) {
+            if (sijainti[1] == 6) { // Jos valkone = rivilla 6 -> ei oo liikkunu
                 if (sijainti[1] - y == 2 && dx == 0) { // eka siirtoo saa olla 2x "eteenpain"
                     return true;
                 }
@@ -40,7 +40,6 @@ public class Sotilas extends Nappi {
                 return true;
             }
         }
-        System.out.println("Sotilas ei voi liikkua noin");
         return false;
     }
 
