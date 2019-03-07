@@ -12,17 +12,7 @@ public class Lauta {
             }
         }
     }
-
-    public String[][] annaLauta() {
-        String[][] palautettava = new String[8][8];
-        for (int y = 0; y < 8; y++) {
-            for (int x = 0; x < 8; x++) {
-                palautettava[x][y] = this.lauta[x][y].annaRuutu();
-            }
-        }
-        return palautettava;
-    }
-
+    
     public Ruutu getRuutu(int x, int y) {
         return this.lauta[x][y];
     }
@@ -35,38 +25,7 @@ public class Lauta {
     public void setRuutuTyhjaksi(int x, int y) {
         this.lauta[x][y].setNappi();
     }
-
-    public void tulostaLauta() {
-        String[] kirjaimet = {"A", "B", "C", "D", "E", "F", "G", "H"};
-        String poikkiviiva = "   ---  --- ---  --- ---  --- ---  ---";
-        System.out.println(poikkiviiva);
-        for (int y = 0; y < 8; y++) {
-            System.out.print((y + 1) + " ");
-            int tyhjia = 0;
-            for (int x = 0; x < 8; x++) {
-                if (this.lauta[x][y].onkoTyhja()) {
-                    tyhjia++;
-                }
-                System.out.print(this.lauta[x][y].tulostaRuutu());
-                if (tyhjia % 3 == 1) {
-                    System.out.print(" ");
-                    tyhjia++;
-                }
-            }
-            System.out.println("|");
-            System.out.println(poikkiviiva);
-        }
-        System.out.print("    ");
-        for (int i = 0; i < 8; i++) {
-            System.out.print(kirjaimet[i] + "   ");
-            if (i % 2 == 0) {
-                System.out.print(" ");
-            }
-        }
-        System.out.println("");
-        System.out.println("");
-    }
-
+    
     public boolean siirra(int x1, int y1, int x2, int y2) {
         Nappi n = getRuutu(x1, y1).getNappi();
         if (voikoSiirtaa(x1, y1, x2, y2) && eiMattia(x1, y1, x2, y2)) {
@@ -188,7 +147,6 @@ public class Lauta {
             for (int x = 0; x < 8; x++) {
                 if (!(getRuutu(x, y).onkoTyhja())) {
                     if (getRuutu(x, y).getNappi().getVari() != vari) {
-                        // pitas saada haettua, et voiko taa nappi syoda kuninkaan ja jos voi ni palautetaa true;
                         if (voikoSiirtaa(x, y, x1, y1)) {
                             return true;
                         }
@@ -210,7 +168,6 @@ public class Lauta {
                     for (int x2 = 0; x2 < 8; x2++) {
                         for (int y2 = 0; y2 < 8; y2++) {
                             if (voikoSiirtaa(x, y, x2, y2) && eiMattia(x, y, x2, y2)) {
-                                //System.out.println("Nappi " + getRuutu(x, y).getNappi().tulostaNappi() + " sijainnissa " + (x+1) + ", " + (y+1) +" olisi muka pystynyt liikkumaan kohtaan " + (x2+1) + ", " + (y2+1));
                                 return false;
                             }
                         }
@@ -218,7 +175,6 @@ public class Lauta {
                 }
             }
         }
-        System.out.println("SHAKKIMATTI");
         return true;
     }
 }

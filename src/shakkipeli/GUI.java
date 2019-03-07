@@ -8,12 +8,20 @@ import java.util.Scanner;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import static javafx.application.Application.launch;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 /**
@@ -27,7 +35,13 @@ public class GUI extends Application {
     private Label infolabel;
     private Label errorlabel;
     private GridPane pane;
-    private GridPane textPane;
+    private BorderPane nappiPane;
+    private Button avustinBtn;
+    private Button tallennaJaLopetaBtn;
+    private Label avustinLabel;
+    private GridPane avustinPane;
+    private String origStyle;
+    private VBox labelbox;
 
     private ArrayList<fxButton> lista = new ArrayList<>();
     private int valintoja;
@@ -47,6 +61,7 @@ public class GUI extends Application {
 
     private boolean avustin;
     private boolean shakkimatti;
+    private boolean guiAlustettu;
 
     public static void main(String[] args) {
         launch(args);
@@ -54,10 +69,33 @@ public class GUI extends Application {
 
     @Override
     public void start(Stage ikkuna) throws Exception {
-        //TODO: vanha peli: haetaan ja kysytaan mita vanhoista peleista jatketaan
         ikkuna.setTitle("Shakki");
+
+        ikkuna.setScene(alkuNakyma());
+        ikkuna.setResizable(false);
+
+        new AnimationTimer() {
+
+            @Override
+            public void handle(long time) {
+                if (nakyma.equals("alkunakyma")) {
+                    ikkuna.setScene(alkuNakyma());
+                } else if (nakyma.equals("pelaa")) {
+                    ikkuna.setScene(scene);
+                    pelaa();
+                } else if (nakyma.equals("pelaajien valinta")) {
+                    ikkuna.setScene(annaPelaajat());
+                } else if (nakyma.equals("lataa")) {
+                    ikkuna.setScene(vanhatPelitNakyma());
+                }
+            }
+        }.start();
+
+        ikkuna.show();
+    }
+
+    private void alustaGUI() {
         asettelu = new BorderPane();
-        textPane = new GridPane();
 
         infolabel = new Label(pelaaja1 + "n (Valkoinen) vuoro");
         infolabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18px");
@@ -65,20 +103,16 @@ public class GUI extends Application {
         errorlabel = new Label();
         errorlabel.setStyle("-fx-font-weight: bold; -fx-font-size: 18px");
 
-        textPane.add(infolabel, 0, 0);
-        textPane.add(errorlabel, 0, 1);
+        labelbox = new VBox();
+        labelbox.getChildren().addAll(infolabel, errorlabel);
+        labelbox.setAlignment(Pos.CENTER);
 
-        BorderPane labelPane = new BorderPane();
-        labelPane.setCenter(textPane);
-
-        asettelu.setTop(labelPane);
+        asettelu.setTop(labelbox);
         pane = new GridPane();
 
-        pelaaja1 = "";
-        pelaaja2 = "";
-        vuoro = Vari.VALKOINEN;
-
-        alustaUusiPeli();
+        if (vuoro == null) {
+            vuoro = Vari.VALKOINEN;
+        }
 
         for (int i = 0; i < 8; i++) {
             Label l = new Label(Integer.toString(8 - i));
@@ -87,7 +121,7 @@ public class GUI extends Application {
         }
         String[] columns = {"A", "B", "C", "D", "E", "F", "G", "H"};
         for (int i = 1; i < 9; i++) {
-            Label l = new Label("    " + columns[i - 1]);
+            Label l = new Label("      " + columns[i - 1]);
             l.setStyle("-fx-font-weight: bold; -fx-font-size: 16px");
             pane.add(l, i, 9);
         }
@@ -113,12 +147,13 @@ public class GUI extends Application {
                 laskuri++;
             }
         }
-        BorderPane nappiPane = new BorderPane();
 
-        Button tallennaJaLopetaBtn = new Button("Tallenna ja Lopeta");
-        Button avustinBtn = new Button();
-        Label avustinLabel = new Label("Avustin (Off)");
-        GridPane avustinPane = new GridPane();
+        nappiPane = new BorderPane();
+
+        tallennaJaLopetaBtn = new Button("Tallenna ja Lopeta");
+        avustinBtn = new Button();
+        avustinLabel = new Label("Avustin (Off)");
+        avustinPane = new GridPane();
 
         avustinPane.add(avustinBtn, 0, 0);
         avustinPane.add(avustinLabel, 1, 0);
@@ -126,7 +161,10 @@ public class GUI extends Application {
         nappiPane.setLeft(avustinPane);
         nappiPane.setCenter(tallennaJaLopetaBtn);
 
-        String origStyle = avustinBtn.getStyle();
+        asettelu.setBottom(nappiPane);
+        asettelu.setCenter(pane);
+
+        origStyle = avustinBtn.getStyle();
 
         tallennaJaLopetaBtn.setOnAction((e) -> {
             tallennaPeli();
@@ -141,33 +179,12 @@ public class GUI extends Application {
                 avustinBtn.setStyle(origStyle);
             }
         });
-        asettelu.setBottom(nappiPane);
-
-        asettelu.setCenter(pane);
-
         scene = new Scene(asettelu);
+        guiAlustettu = true;
 
-        ikkuna.setScene(alkuNakyma());
-
-        new AnimationTimer() {
-
-            @Override
-            public void handle(long time) {
-                if (nakyma.equals("alkunakyma")) {
-                    ikkuna.setScene(alkuNakyma());
-                } else if (nakyma.equals("pelaa")) {
-                    ikkuna.setScene(scene);
-                    pelaa();
-                } else if (nakyma.equals("pelaajien valinta")) {
-                    ikkuna.setScene(annaPelaajat());
-                }
-            }
-        }.start();
-
-        ikkuna.show();
     }
 
-    public void alustaUusiPeli() {
+    private void alustaUusiPeli() {
         this.lauta = new Lauta();
         for (int i = 0; i < 8; i++) { // sotilaat
             lauta.setRuutu(i, 1, new Sotilas(Vari.MUSTA));
@@ -226,7 +243,7 @@ public class GUI extends Application {
     /**
      * Asettaa kaikki tyhjat GUI-ruudut painamattomiksi
      */
-    public void asetaKaikkiTyhjatPainamattomiksi() {
+    private void asetaKaikkiTyhjatPainamattomiksi() {
         for (fxButton btn : lista) {
             int x = btn.getCoord()[0];
             int y = btn.getCoord()[1];
@@ -239,7 +256,7 @@ public class GUI extends Application {
     /**
      * Asettaa kaikki GUI-ruudut painamattomiksi
      */
-    public void asetaKaikkiPainamattomiksi() {
+    private void asetaKaikkiPainamattomiksi() {
         for (fxButton btn : lista) {
             btn.setPainettu(false);
         }
@@ -252,7 +269,7 @@ public class GUI extends Application {
      * @param xToka = x-koordinaatti, mihin ruutuun nappula siirretaan
      * @param yToka = y-koordinaatti, mihin ruutuun nappula siirretaan
      */
-    public void siirra(int xEka, int yEka, int xToka, int yToka) {
+    private void siirra(int xEka, int yEka, int xToka, int yToka) {
         fxButton btn1 = lista.get(0);
         fxButton btn2 = lista.get(0);
         for (fxButton btn : lista) {
@@ -268,7 +285,7 @@ public class GUI extends Application {
         btn1.setText((" "));
     }
 
-    public void vaihdaPelaajaa() {
+    private void vaihdaPelaajaa() {
         if (vuoro == Vari.VALKOINEN) {
             vuoro = Vari.MUSTA;
         } else {
@@ -276,9 +293,13 @@ public class GUI extends Application {
         }
     }
 
-    public Scene alkuNakyma() {
-        GridPane pane = new GridPane();
-        pane.setPrefSize(400, 400);
+    private Scene alkuNakyma() {
+        File imageFile = new File("shakki.png");
+        String fileLocation = imageFile.toURI().toString();
+        Image image = new Image(fileLocation);
+        ImageView imgview = new ImageView(image);
+        BorderPane pane = new BorderPane();
+        pane.setTop(imgview);
 
         Label l = new Label("   ");
 
@@ -291,10 +312,11 @@ public class GUI extends Application {
         btn.setOnAction((e) -> {
             nakyma = "pelaajien valinta";
         });
-
-        pane.add(btn, 0, 0);
-        pane.add(l, 1, 0);
-        pane.add(vanha, 2, 0);
+        HBox box = new HBox();
+        box.getChildren().addAll(btn, l, vanha);
+        box.setAlignment(Pos.CENTER);
+        box.setSpacing(10);
+        pane.setCenter(box);
 
         nakyma = "alku";
 
@@ -302,9 +324,72 @@ public class GUI extends Application {
         return scene;
     }
 
-    public Scene annaPelaajat() {
+    private Scene vanhatPelitNakyma() {
+        nakyma = "";
         GridPane pane = new GridPane();
-        pane.setPrefSize(400, 400);
+        Button btn = new Button("Takaisin");
+        Label label = new Label("Mitä peliä haluat jatkaa?");
+        Label nimiLabel = new Label("Pelin nimi");
+        Label pelaajat1Label = new Label("Pelaaja 1  ");
+        Label pelaajat2Label = new Label("Pelaaja 2");
+
+        pane.add(btn, 0, 0);
+        pane.add(label, 1, 1);
+        pane.add(nimiLabel, 1, 2);
+        pane.add(pelaajat1Label, 2, 2);
+        pane.add(pelaajat2Label, 3, 2);
+
+        btn.setOnAction((e) -> {
+            nakyma = "alkunakyma";
+        });
+
+        ArrayList<String> lista = getPelit();
+        ArrayList<String> nimiLista = new ArrayList<>(); // nimiLista on muodossa "PelinNimi pelaaja1 pelaaja2 indeksi"
+        for (int i = 0; i < lista.size(); i++) { // haetaan pelien ja niiden pelaajien nimet tallennetuista peleista
+            if (lista.get(i).contains("NIMI: ")) {
+                String pelitiedot = lista.get(i).split(" ")[1];
+                pelitiedot += " " + lista.get(i + 1).split(" ")[1]; // pelaaja1:n nimi
+                pelitiedot += " " + lista.get(i + 2).split(" ")[1]; // pelaaja2:n nimi
+                pelitiedot += " " + i;
+                nimiLista.add(pelitiedot);
+            }
+        }
+        for (int i = 0; i < nimiLista.size(); i++) {
+            Button valitseBtn = new Button("Jatka");
+            Label peli = new Label(nimiLista.get(i).split(" ")[0]);
+            Label p1Label = new Label(nimiLista.get(i).split(" ")[1]);
+            Label p2Label = new Label(nimiLista.get(i).split(" ")[2]);
+            pane.add(valitseBtn, 0, 3 + i);
+            pane.add(peli, 1, 3 + i);
+            pane.add(p1Label, 2, 3 + i);
+            pane.add(p2Label, 3, 3 + i);
+            int ind = Integer.parseInt(nimiLista.get(i).split(" ")[3]);
+            valitseBtn.setOnAction((e) -> {
+                ArrayList<String> jatkoLista = new ArrayList<>();
+                for (int j = ind; j < ind + 70; j++) {
+                    jatkoLista.add(lista.get(j));
+                }
+                jatkaVanhaaPelia(jatkoLista);
+                nakyma = "pelaa";
+            });
+        }
+
+        return new Scene(pane);
+    }
+
+    private ArrayList<String> getPelit() {
+        ArrayList<String> lista = new ArrayList<>();
+        try (Scanner lukija = new Scanner(new File("Tallennetut pelit.txt"))) {
+            while (lukija.hasNextLine()) {
+                lista.add(lukija.nextLine());
+            }
+        } catch (Exception e) {
+        }
+        return lista;
+    }
+
+    private Scene annaPelaajat() {
+        GridPane pane = new GridPane();
 
         Label label = new Label("Anna pelaajien nimet:");
 
@@ -330,7 +415,7 @@ public class GUI extends Application {
                 pelaaja2 = pelaaja2Text.getText();
                 p1Vari = Vari.VALKOINEN;
                 p2Vari = Vari.MUSTA;
-
+                alustaUusiPeli();
                 nakyma = "pelaa";
             }
         });
@@ -358,8 +443,9 @@ public class GUI extends Application {
         return scene;
     }
 
-    public void tallennaPeli() {
+    private void tallennaPeli() {
         Stage ikkuna2 = new Stage();
+        ikkuna2.setResizable(false);
         ikkuna2.setTitle("Tallenna peli");
         GridPane pane = new GridPane();
 
@@ -377,9 +463,12 @@ public class GUI extends Application {
             } else if (onJoSamanNiminen(tf.getText())) {
                 eLabel.setText("Saman niminen peli on jo tallennettuna");
             } else {
+                tallenna(tf.getText());
                 eLabel.setText("Peli tallennettu!");
-                tf.setText("");
+                pane.add(new Label(tf.getText()), 1, 1);
+                tf.setVisible(false);
                 tallennaBtn.setVisible(false);
+
             }
         });
         takaisin.setOnAction((e) -> {
@@ -398,19 +487,23 @@ public class GUI extends Application {
         pane.add(tallennaBtn, 0, 2);
         pane.add(lopeta, 1, 2);
 
-        pane.add(eLabel, 1, 3);
+        BorderPane asettelu = new BorderPane();
+        asettelu.setTop(pane);
+        asettelu.setBottom(eLabel);
 
-        Scene scene = new Scene(pane);
+        Scene scene = new Scene(asettelu);
 
         ikkuna2.setScene(scene);
         ikkuna2.show();
     }
 
-    public void tallenna(String nimi) {
-        GridPane pane = new GridPane();
-        File file = new File("Tallenetut pelit.txt");
+    private void tallenna(String nimi) {
         try {
+            ArrayList<String> vanhatPelit = getPelit();
             PrintWriter kirjoittaja = new PrintWriter("Tallennetut pelit.txt");
+            for (String rivi : vanhatPelit) {
+                kirjoittaja.println(rivi);
+            }
 
             kirjoittaja.println("NIMI: " + nimi);
 
@@ -437,34 +530,36 @@ public class GUI extends Application {
         }
     }
 
-    public boolean onJoSamanNiminen(String nimi) {
-        return false;
-    }
-
-    public void jatkaVanhaaPelia() {
-        // TODO : fix vanhan pelin jatkaminen
-
-        // luetaan vanha peli, alustetaan pelaajat, lauta ja napit sen mukaan ja jatketaan pelaamista siita
-        /*
+    private boolean onJoSamanNiminen(String nimi) {
         ArrayList<String> lista = new ArrayList<>();
         try (Scanner lukija = new Scanner(new File("Tallennetut pelit.txt"))) {
             while (lukija.hasNextLine()) {
                 lista.add(lukija.nextLine());
             }
         } catch (Exception e) {
-            System.out.println("Ei tallennettuja pelejä");
-            System.exit(0);
         }
+        for (String rivi : lista) {
+            if (rivi.contains("NIMI: ")) {
+                String pelinNimi = rivi.split(" ")[1];
+                if (nimi.equals(pelinNimi)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void jatkaVanhaaPelia(ArrayList<String> lista) {
         lauta = new Lauta();
         for (int i = 0; i < lista.size(); i++) {
             if (lista.get(i).contains("Pelaaja")) { // haetaan pelaajat ja niiden varit
                 if (lista.get(i).contains("Pelaaja1")) { // alustetaan pelaaja1
                     String[] rivi = lista.get(i).split(" ");
-                    p1 = rivi[1];
+                    pelaaja1 = rivi[1];
                     p1Vari = annaVari(rivi[rivi.length - 1]);
                 } else { // alustetaan pelaaja2
                     String[] rivi = lista.get(i).split(" ");
-                    p2 = rivi[1];
+                    pelaaja2 = rivi[1];
                     p2Vari = annaVari(rivi[rivi.length - 1]);
                 }
             } else if (lista.get(i).contains("vuorossa on")) { // katotaan kumman vuoroon jai
@@ -477,33 +572,37 @@ public class GUI extends Application {
                 String[] rivi = lista.get(i).split(" ");
                 int x = Integer.parseInt(rivi[1]);
                 int y = Integer.parseInt(rivi[2]);
-                String s = rivi[3];
-                Arvo arvo = annaArvo(rivi[3]);
+                String arvo = rivi[3];
                 Vari vari = annaVari(rivi[4]);
-                int siirrot = Integer.parseInt(rivi[5]);
                 Nappi n;
-                if (s.equals("TORNI")) {
+                if (arvo.equals("TORNI")) {
                     n = new Torni(vari);
-                } else if (s.equals("LAHETTI")) {
+                } else if (arvo.equals("LAHETTI")) {
                     n = new Lahetti(vari);
-                } else if (s.equals("RATSU")) {
+                } else if (arvo.equals("RATSU")) {
                     n = new Ratsu(vari);
-                } else if (s.equals("KUNINGAS")) {
+                } else if (arvo.equals("KUNINGAS")) {
                     n = new Kuningas(vari);
-                } else if (s.equals("KUNINGATAR")) {
+                } else if (arvo.equals("KUNINGATAR")) {
                     n = new Kuningatar(vari);
                 } else {
                     n = new Sotilas(vari);
                 }
-                n.setSiirrot(siirrot - 1);
                 lauta.setRuutu(x, y, n);
             }
         } // end of listan parseus
-        lauta.tulostaLauta();
-        pelaa();*/
+        nakyma = "pelaa";
     }
 
-    public void korostaKaikkiMahdollisetSiirrot(int x1, int y1) {
+    private Vari annaVari(String s) {
+        if (s.equals("VALKOINEN")) {
+            return Vari.VALKOINEN;
+        } else {
+            return Vari.MUSTA;
+        }
+    }
+
+    private void korostaKaikkiMahdollisetSiirrot(int x1, int y1) {
         for (fxButton btn : lista) {
             int[] xy = btn.getCoord();
             if (lauta.voikoSiirtaa(x1, y1, xy[0], xy[1]) && lauta.eiMattia(x1, y1, xy[0], xy[1])) {
@@ -514,18 +613,30 @@ public class GUI extends Application {
         }
 
     }
-    public void aloitetaankoUusiPeli(String voittaja) {
+
+    private void onnittelut(String voittaja) {
         Stage ikkuna2 = new Stage();
-        
+        ikkuna2.setTitle("ShakkiMatti!");
+        ikkuna2.setResizable(false);
+
         BorderPane pane = new BorderPane();
         Label iLabel = new Label("Onneksi olkoon " + voittaja + "!");
-        pane.setCenter(iLabel);
+        pane.setTop(iLabel);
         
+        Button lopeta = new Button("Lopeta");
+        pane.setCenter(lopeta);
+        lopeta.setOnAction((e) -> {
+            System.exit(0);
+        });
+
         ikkuna2.setScene(new Scene(pane));
         ikkuna2.show();
     }
 
-    public void pelaa() {
+    private void pelaa() {
+        if (!guiAlustettu) {
+            alustaGUI();
+        }
         if (lauta.shakkiMatti(vuoro)) {
             String voittaja;
             if (vuoro == p1Vari) {
@@ -536,8 +647,8 @@ public class GUI extends Application {
             infolabel.setText(voittaja + " VOITTI ");
             errorlabel.setText("!!! SHAKKIMATTI !!!");
             if (!shakkimatti) {
-                aloitetaankoUusiPeli(voittaja);
-                shakkimatti=true;
+                shakkimatti = true;
+                onnittelut(voittaja);
             }
             return;
         }
@@ -545,7 +656,6 @@ public class GUI extends Application {
         if (vuoro == Vari.MUSTA) {
             svari = "Musta";
         }
-
         if (vuoro == p1Vari) {
             infolabel.setText(pelaaja1 + "n (" + svari + ") vuoro");
         } else {
@@ -584,7 +694,6 @@ public class GUI extends Application {
                             yEka = -1;
                             asetaKaikkiPainamattomiksi();
                         } else {
-                            System.out.println("Virheellinen siirto, terveisin GUI");
                             btn.setPainettu(false);
                         }
 
