@@ -8,10 +8,6 @@ public class Sotilas extends Nappi {
         super(vari);
     }
 
-    public void setArvo(Arvo arvo) { // jos sotilas paasee paatyyn asti, sen arvo voi muuttua
-        this.arvo = arvo;
-    }
-
     public boolean onkoSallittuSiirto(int x, int y) {
         if (x < 0 || x > 7 || y < 0 || y > 7) { // pysyyko laudalla
             return false;

@@ -9,20 +9,24 @@ public class Ruutu {
     public Ruutu() {
         this.tyhja = true;
     }
-    public String annaRuutu() {
-        if (onkoTyhja()) {
-            return " ";
-        } else {
-            return this.nappi.tulostaNappi();
-        }
-    }
+    /**
+     * Asettaa ruutuun napin
+     * @param nappi 
+     */
     public void setNappi(Nappi nappi) {
         this.tyhja = false;
         this.nappi = nappi;
     }
+    /**
+     * Asettaa ruudun tyhjäksi
+     */
     public void setNappi() {
         this.tyhja = true;
     }
+    /**
+     * palauttaa ruudussa olevan napin
+     * @return 
+     */
     public Nappi getNappi() {
         return this.nappi;
     }
@@ -32,13 +36,6 @@ public class Ruutu {
      */
     public boolean onkoTyhja() {
         return this.tyhja;
-    }
-    public String tulostaRuutu() {
-        if (onkoTyhja()) {
-            return "|   ";
-        } else {
-            return "| " + this.nappi.tulostaNappi() + " ";
-        }
     }
     
 }

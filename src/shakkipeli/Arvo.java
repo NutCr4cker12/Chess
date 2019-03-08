@@ -2,6 +2,6 @@
 package shakkipeli;
 
 public enum Arvo {
-    KUNINGAS, KUNINGATAR, LAHETTI, TORNI, RATSU, SOTILAS;
+    SOTILAS, KUNINGAS, KUNINGATAR, LAHETTI, TORNI, RATSU;
     
 }

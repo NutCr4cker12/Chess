@@ -4,6 +4,9 @@ public class Lauta {
 
     private Ruutu[][] lauta;
 
+    /**
+     * Alustaa uuden, 8*8 laudan tyhjillä ruuduilla
+     */
     public Lauta() {
         this.lauta = new Ruutu[8][8];
         for (int i = 0; i < 8; i++) {
@@ -12,61 +15,47 @@ public class Lauta {
             }
         }
     }
-
-    public String[][] annaLauta() {
-        String[][] palautettava = new String[8][8];
-        for (int y = 0; y < 8; y++) {
-            for (int x = 0; x < 8; x++) {
-                palautettava[x][y] = this.lauta[x][y].annaRuutu();
-            }
-        }
-        return palautettava;
-    }
-
+    
+    /**
+     * 
+     * @param x - koordinaatti
+     * @param y - koordinaatti
+     * @return ruutu kyseisessä koordinaatissa
+     */
     public Ruutu getRuutu(int x, int y) {
         return this.lauta[x][y];
     }
 
+    /**
+     * Asettaa ruutuun x,y pelinappulan nappi
+     * @param x - koordinaatti
+     * @param y - koordinaatti
+     * @param nappi 
+     */
     public void setRuutu(int x, int y, Nappi nappi) {
         this.lauta[x][y].setNappi(nappi);
         nappi.setSijainti(x, y);
     }
 
+    /**
+     * Asettaa ruudun x, y tyhjäksi
+     * @param x - koordinaatti
+     * @param y  - koordinaatti
+     */
     public void setRuutuTyhjaksi(int x, int y) {
         this.lauta[x][y].setNappi();
     }
-
-    public void tulostaLauta() {
-        String[] kirjaimet = {"A", "B", "C", "D", "E", "F", "G", "H"};
-        String poikkiviiva = "   ---  --- ---  --- ---  --- ---  ---";
-        System.out.println(poikkiviiva);
-        for (int y = 0; y < 8; y++) {
-            System.out.print((y + 1) + " ");
-            int tyhjia = 0;
-            for (int x = 0; x < 8; x++) {
-                if (this.lauta[x][y].onkoTyhja()) {
-                    tyhjia++;
-                }
-                System.out.print(this.lauta[x][y].tulostaRuutu());
-                if (tyhjia % 3 == 1) {
-                    System.out.print(" ");
-                    tyhjia++;
-                }
-            }
-            System.out.println("|");
-            System.out.println(poikkiviiva);
-        }
-        System.out.print("    ");
-        for (int i = 0; i < 8; i++) {
-            System.out.print(kirjaimet[i] + "   ");
-            if (i % 2 == 0) {
-                System.out.print(" ");
-            }
-        }
-        System.out.println("");
-        System.out.println("");
-    }
-
+    
+    /**
+     * Tarkistaa, onko annettu siirto sallittu siirto ja
+     * suorittaa siiroon ja palauttaa true, jos kyllä
+     * ei suorita siirtoa ja palauttaa false, jos ei
+     * @param x1 - siirrettävän napin x-koordinaatti
+     * @param y1 - siirrettävän napin y-koordinaatti
+     * @param x2 - ruudun x-koordinaatti, mihin nappi siirretään
+     * @param y2 - ruudun y-koordinaatti, mihin nappi siirretään
+     * @return true jos siirto suoritettiin, false muutoin
+     */
     public boolean siirra(int x1, int y1, int x2, int y2) {
         Nappi n = getRuutu(x1, y1).getNappi();
         if (voikoSiirtaa(x1, y1, x2, y2) && eiMattia(x1, y1, x2, y2)) {
@@ -81,6 +70,17 @@ public class Lauta {
         }
     }
 
+    /**
+     * Tarkistaa ensin, voiko valittu pelinappula liikkua pyydetyllä tavalla
+     * Tarkistaa seuraavaksi, ettei yritetä siirtää oman pelaajan päälle
+     * Tarkistaa seuraavaksi, ettei yritetä "hyppiä" omien pelaajien yli (pl. ratsu)
+     * Tarkistaa seuraavaksi sotilaan erikoisliikkeet (syönti sallittu vain sivuttain)
+     * @param x1 - siirrettävän napin x-koordinaatti
+     * @param y1 - siirrettävän napin y-koordinaatti
+     * @param x2 - ruudun x-koordinaatti, mihin nappi siirretään
+     * @param y2 - ruudun y-koordinaatti, mihin nappi siirretään
+     * @return true jos siirto on sallittu, false jos ei
+     */
     public boolean voikoSiirtaa(int x1, int y1, int x2, int y2) {
         Nappi n = getRuutu(x1, y1).getNappi();
         if (!(n.onkoSallittuSiirto(x2, y2))) {
@@ -138,6 +138,15 @@ public class Lauta {
         return true;
     }
 
+    /**
+     * Tarkistaa, ettei valittu siirto aiheuta siirtoa suorittavalle pelaaja mattitilannetta
+     * Ts. ei voi siirtää esimerkiksi ratsua pois kuninkaan edestä, jos seuraavalla siirrolla kuningas voitaisiin syödä
+     * @param x1 - siirrettävän napin x-koordinaatti
+     * @param y1 - siirrettävän napin y-koordinaatti
+     * @param x2 - ruudun x-koordinaatti, mihin nappi siirretään
+     * @param y2 - ruudun y-koordinaatti, mihin nappi siirretään
+     * @return true jos siirto ei synnytä mattitilannetta, false muutoin
+     */
     public boolean eiMattia(int x1, int y1, int x2, int y2) {
         Nappi n = getRuutu(x1, y1).getNappi();
         Nappi kopionappi = getRuutu(x1, y1).getNappi();
@@ -165,6 +174,12 @@ public class Lauta {
         return true;
     }
 
+    /**
+     * Tarkistaa onko pelaajalla mattitilanne päällä,
+     * eli kuningas tulee saada turvattua seuraavalla siirrolla
+     * @param vari - vuorossa olevan pelaajan väri
+     * @return true jos on mattitilanne, false jos ei
+     */
     public boolean onkoMattiTilanne(Vari vari) {
         int x1 = -1;
         int y1 = -1;
@@ -188,7 +203,6 @@ public class Lauta {
             for (int x = 0; x < 8; x++) {
                 if (!(getRuutu(x, y).onkoTyhja())) {
                     if (getRuutu(x, y).getNappi().getVari() != vari) {
-                        // pitas saada haettua, et voiko taa nappi syoda kuninkaan ja jos voi ni palautetaa true;
                         if (voikoSiirtaa(x, y, x1, y1)) {
                             return true;
                         }
@@ -201,7 +215,7 @@ public class Lauta {
     /**
      * Tarkistaa, onko tilanne ShakkiMatti
      * @param vari = siirtovuorossa olevan pelaajan vari
-     * @return true jos tilanne siirtovuorossa oleva pelaaja ei voi suorittaa ainuttakaan laillista siirtoa
+     * @return true jos tilanne siirtovuorossa oleva pelaaja ei voi suorittaa ainuttakaan laillista siirtoa, false muutoin
      */
     public boolean shakkiMatti(Vari vari) {
         for (int x = 0; x < 8; x++) {
@@ -210,7 +224,6 @@ public class Lauta {
                     for (int x2 = 0; x2 < 8; x2++) {
                         for (int y2 = 0; y2 < 8; y2++) {
                             if (voikoSiirtaa(x, y, x2, y2) && eiMattia(x, y, x2, y2)) {
-                                //System.out.println("Nappi " + getRuutu(x, y).getNappi().tulostaNappi() + " sijainnissa " + (x+1) + ", " + (y+1) +" olisi muka pystynyt liikkumaan kohtaan " + (x2+1) + ", " + (y2+1));
                                 return false;
                             }
                         }
@@ -218,7 +231,13 @@ public class Lauta {
                 }
             }
         }
-        System.out.println("SHAKKIMATTI");
         return true;
+    }
+    public int[] sotilasPaadyssa() {
+        int[] xy = null;
+        for (int i = 0; i < 8; i++) {
+            //if ()
+        }
+        return xy;
     }
 }
