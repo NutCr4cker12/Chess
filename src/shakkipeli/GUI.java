@@ -15,9 +15,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BackgroundImage;
-import javafx.scene.layout.BackgroundPosition;
-import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -180,10 +177,11 @@ public class GUI extends Application {
             avustin = !avustin;
             if (avustin) {
                 avustinLabel.setText("Avustin (On) ");
-                avustinBtn.setStyle("-fx-background-color: #b3e0ff ;");
+                avustinBtn.setStyle("-fx-background-color: #00cc00 ;");
             } else {
                 avustinLabel.setText("Avustin (Off)");
                 avustinBtn.setStyle(origStyle);
+                avustinBtn.setPrefHeight(20);
             }
         });
         scene = new Scene(asettelu);
@@ -774,9 +772,10 @@ public class GUI extends Application {
             }
             return;
         }
+        /*
         if (lauta.sotilasPaadyssa() != null) {
 
-        }
+        }*/
         String svari = "Valkoinen";
         if (vuoro == Vari.MUSTA) {
             svari = "Musta";
